@@ -1,0 +1,28 @@
+# Falha em erros de sintaxe e nomes indefinidos; os avisos de estilo só são listados.
+name: Python application
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Instalar dependências
+        run: pip install -r requirements.txt flake8
+      - name: Verificar erros
+        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+      - name: Listar avisos de estilo
+        run: flake8 . --count --exit-zero --max-line-length=127 --statistics

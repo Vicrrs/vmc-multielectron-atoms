@@ -1,0 +1,8 @@
+name: vmc-multielectron-atoms
+channels:
+  - conda-forge
+dependencies:
+  - python=3.14
+  - numba=0.68.1
+  - numpy=2.5.4
+  - matplotlib=3.11.2

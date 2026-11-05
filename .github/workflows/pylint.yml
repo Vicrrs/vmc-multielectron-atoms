@@ -1,0 +1,29 @@
+# Falha apenas em erros. no-value-for-parameter fica desligado porque o pylint
+# não entende as funções decoradas com @cuda.jit e acusa um falso positivo.
+name: Pylint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pylint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Instalar dependências
+        run: pip install -r requirements.txt pylint
+      - name: Verificar erros
+        run: pylint --errors-only --disable=no-value-for-parameter $(git ls-files '*.py')
+      - name: Mostrar relatório completo
+        run: pylint --exit-zero $(git ls-files '*.py')
