@@ -1,0 +1,36 @@
+# Cria o ambiente de environment.yml e executa os scripts no simulador CUDA.
+name: Python Package using Conda
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash -el {0}
+    env:
+      NUMBA_ENABLE_CUDASIM: "1"
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v7
+      - uses: conda-incubator/setup-miniconda@v4
+        with:
+          miniforge-version: latest
+          environment-file: environment.yml
+          activate-environment: vmc-multielectron-atoms
+      - name: Executar os scripts
+        run: |
+          git ls-files '*.py' | while read -r script; do
+            echo "::group::$script"
+            timeout 300 python "$script"
+            echo "::endgroup::"
+          done

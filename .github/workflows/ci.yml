@@ -1,0 +1,34 @@
+# Executa todos os scripts no simulador CUDA do Numba (os runners não têm GPU).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NUMBA_ENABLE_CUDASIM: "1"
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+      - name: Executar os scripts
+        run: |
+          git ls-files '*.py' | while read -r script; do
+            echo "::group::$script"
+            timeout 300 python "$script"
+            echo "::endgroup::"
+          done
